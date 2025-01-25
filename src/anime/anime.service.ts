@@ -33,7 +33,7 @@ export class AnimeService {
       genres.map(async (genre) => {
         return this.prismaService.genre.findUnique({
           where: {
-            name: genre,
+            name: genre.name,
           },
         });
       }),
@@ -50,9 +50,30 @@ export class AnimeService {
     });
   }
 
-  async findAll(): Promise<AnimeResponse[]> {
-    return this.prismaService.anime.findMany({
+  async findAll(
+    page: number = 1,
+    limit: number = 10,
+    filter?: { genre?: string; title?: string },
+  ) {
+    const offset = (page - 1) * limit;
+    const animeData = await this.prismaService.anime.findMany({
       include: { genres: true },
+      skip: offset,
+      take: limit,
+      where: {
+        title: { contains: filter?.title },
+        genres: filter?.genre ? { some: { name: filter.genre } } : undefined,
+      },
     });
+    const total = await this.prismaService.anime.count({
+      where: {
+        title: { contains: filter?.title },
+        genres: filter?.genre ? { some: { name: filter.genre } } : undefined,
+      },
+    });
+    return {
+      animeData,
+      metadata: { total, page, limit },
+    };
   }
 }
