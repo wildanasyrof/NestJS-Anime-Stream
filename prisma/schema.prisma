@@ -1,0 +1,47 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/client"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Anime {
+  id           Int      @id @default(autoincrement())
+  title        String
+  alt_titles   String?
+  chapters     String
+  source       String
+  year         String
+  rating       Float
+  synopsis     String
+  image_source String
+  episodes     Episode[]
+  genres       Genre[]  @relation("AnimeGenres")
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+}
+
+model Episode {
+  id          Int      @id @default(autoincrement())
+  title       String
+  number      Int
+  anime_id    Int
+  anime       Anime    @relation(fields: [anime_id], references: [id])
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+}
+
+model Genre {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  animes      Anime[]  @relation("AnimeGenres")
+}
