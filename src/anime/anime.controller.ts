@@ -30,7 +30,7 @@ export class AnimeController {
 
   @Get()
   async findAll(
-    @Query('page') page: number = 2,
+    @Query('page') page: number = 1,
     @Query('limit') limit: number = 5,
     @Query('genre') genre?: string, // Optional: Filter by genre
   ): Promise<WebResponse<AnimeResponse[]>> {

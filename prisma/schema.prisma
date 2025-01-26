@@ -15,7 +15,7 @@ datasource db {
 }
 
 model Anime {
-  id           Int      @id @default(autoincrement())
+  id           Int       @id @default(autoincrement())
   title        String
   alt_titles   String?
   chapters     String
@@ -25,23 +25,24 @@ model Anime {
   synopsis     String
   image_source String
   episodes     Episode[]
-  genres       Genre[]  @relation("AnimeGenres")
-  created_at   DateTime @default(now())
-  updated_at   DateTime @updatedAt
+  genres       Genre[]   @relation("AnimeGenres")
+  created_at   DateTime  @default(now())
+  updated_at   DateTime  @updatedAt
 }
 
 model Episode {
-  id          Int      @id @default(autoincrement())
-  title       String
-  number      Int
-  anime_id    Int
-  anime       Anime    @relation(fields: [anime_id], references: [id])
-  created_at  DateTime @default(now())
-  updated_at  DateTime @updatedAt
+  id             Int      @id @default(autoincrement())
+  anime_id       Int
+  anime          Anime    @relation(fields: [anime_id], references: [id])
+  title          String
+  episode_number Int      @unique
+  video_url      String
+  created_at     DateTime @default(now())
+  updated_at     DateTime @updatedAt
 }
 
 model Genre {
-  id          Int      @id @default(autoincrement())
-  name        String   @unique
-  animes      Anime[]  @relation("AnimeGenres")
+  id     Int     @id @default(autoincrement())
+  name   String  @unique
+  animes Anime[] @relation("AnimeGenres")
 }

@@ -75,7 +75,10 @@ export class AnimeService {
   async findById(id: number): Promise<AnimeResponse> {
     const anime = await this.prismaService.anime.findUnique({
       where: { id },
-      include: { genres: true },
+      include: {
+        genres: true,
+        episodes: true,
+      },
     });
 
     if (!anime) {
