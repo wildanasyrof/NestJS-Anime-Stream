@@ -24,11 +24,6 @@ export class AnimeService {
 
     const { genres, ...animeData } = createRequest;
 
-    // Log genres before attempting to map
-    this.logger.info(
-      `Genres before mapping: ${JSON.stringify(createRequest.genres)}`,
-    );
-
     const genreIds = await Promise.all(
       genres.map(async (genre) => {
         return this.prismaService.genre.findUnique({
@@ -75,5 +70,116 @@ export class AnimeService {
       animeData,
       metadata: { total, page, limit },
     };
+  }
+
+  async findById(id: number): Promise<AnimeResponse> {
+    const anime = await this.prismaService.anime.findUnique({
+      where: { id },
+      include: { genres: true },
+    });
+
+    if (!anime) {
+      throw new HttpException(
+        {
+          message: 'Anime not found',
+          errors: `Anime with ID ${id} does not exist`,
+        },
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    return anime;
+  }
+
+  async update(
+    id: number,
+    request: Partial<CreateAnimeRequest>,
+  ): Promise<AnimeResponse> {
+    this.logger.info(`Update anime request: ${JSON.stringify(request)}`);
+
+    const anime = await this.prismaService.anime.findUnique({
+      where: { id },
+      include: { genres: true },
+    });
+
+    if (!anime) {
+      throw new HttpException(
+        {
+          message: 'Anime not found',
+          errors: `Anime with ID ${id} does not exist`,
+        },
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    const updateRequest = this.validationService.validate(
+      AnimeValidation.UPDATE,
+      request,
+    );
+
+    const { genres, ...animeData } = updateRequest;
+
+    let genreUpdateData = {};
+    if (genres) {
+      const genreIds = await Promise.all(
+        genres.map(async (genre) => {
+          const existingGenre = await this.prismaService.genre.findUnique({
+            where: {
+              name: genre.name,
+            },
+          });
+
+          if (!existingGenre) {
+            throw new HttpException(
+              {
+                message: 'Genre not found',
+                errors: `Genre with name '${genre.name}' does not exist`,
+              },
+              HttpStatus.BAD_REQUEST,
+            );
+          }
+
+          return existingGenre;
+        }),
+      );
+
+      genreUpdateData = {
+        genres: {
+          set: genreIds.map((genre) => ({ id: genre.id })),
+        },
+      };
+    }
+
+    return this.prismaService.anime.update({
+      where: { id },
+      data: {
+        ...animeData,
+        ...genreUpdateData, // Only update genres if provided
+      },
+      include: { genres: true },
+    });
+  }
+
+  async destroy(id: number): Promise<AnimeResponse> {
+    const anime = await this.prismaService.anime.findUnique({
+      where: { id },
+      include: { genres: true },
+    });
+
+    if (!anime) {
+      throw new HttpException(
+        {
+          message: 'Anime not found',
+          errors: `Anime with ID ${id} does not exist`,
+        },
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    await this.prismaService.anime.delete({
+      where: { id },
+    });
+
+    return anime;
   }
 }

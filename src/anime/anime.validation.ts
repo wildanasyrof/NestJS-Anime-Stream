@@ -16,4 +16,22 @@ export class AnimeValidation {
       }),
     ),
   });
+
+  static readonly UPDATE: ZodType = z.object({
+    title: z.string().min(1).max(255).optional(),
+    alt_titles: z.string().nullable().optional(),
+    chapters: z.string().min(1).max(255).optional(),
+    source: z.string().min(1).max(255).optional(),
+    year: z.string().min(1).max(4).optional(),
+    rating: z.number().min(0).max(10).optional(),
+    synopsis: z.string().min(1).optional(),
+    image_source: z.string().optional(),
+    genres: z
+      .array(
+        z.object({
+          name: z.string().min(1).max(255),
+        }),
+      )
+      .optional(),
+  });
 }
