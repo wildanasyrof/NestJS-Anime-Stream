@@ -50,7 +50,7 @@ export class UserService {
     return user;
   }
 
-  async login(request: LoginRequest): Promise<UserResponse> {
+  async login(request: LoginRequest): Promise<User> {
     const dataRequest = this.validationService.validate(
       UserValidation.LOGIN,
       request,
