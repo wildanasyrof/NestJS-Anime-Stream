@@ -11,7 +11,7 @@ import { Prisma } from '@prisma/client';
 export class ErrorFilter implements ExceptionFilter {
   catch(exception: any, host: ArgumentsHost) {
     const response = host.switchToHttp().getResponse();
-    const status =
+    let status =
       exception instanceof HttpException ? exception.getStatus() : 400; // Default to 400 for validation errors
     let message = 'An unknown error occurred';
     let errors: string | { field: string; message: string }[] | undefined;
@@ -30,6 +30,7 @@ export class ErrorFilter implements ExceptionFilter {
       exception instanceof Prisma.PrismaClientKnownRequestError &&
       exception.code === 'P2002'
     ) {
+      status = 409;
       message = 'Unique constraint violation';
       const field = exception.meta?.target ? exception.meta.target : 'field';
       errors = `The value for ${field} is already exist.`;
