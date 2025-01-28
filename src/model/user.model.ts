@@ -9,8 +9,6 @@ export class UserResponse {
   username: string;
   email: string;
   role: string;
-  created_at: Date;
-  updated_at: Date;
 }
 
 export class User {

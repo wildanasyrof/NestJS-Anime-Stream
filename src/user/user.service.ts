@@ -30,10 +30,16 @@ export class UserService {
     return user;
   }
 
-  async findById(id: string): Promise<User> {
+  async findById(id: string): Promise<UserResponse> {
     const user = await this.prismaService.user.findFirst({
       where: {
         id: id,
+      },
+      select: {
+        id: true,
+        username: true,
+        email: true,
+        role: true,
       },
     });
 
@@ -46,6 +52,8 @@ export class UserService {
         HttpStatus.NOT_FOUND,
       );
     }
+
+    this.logger.info(`User found: ${JSON.stringify(user)}`);
 
     return user;
   }
