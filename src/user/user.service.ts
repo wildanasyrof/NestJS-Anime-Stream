@@ -2,7 +2,12 @@ import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { PrismaService } from 'src/common/prisma/prisma.service';
 import { ValidationService } from 'src/common/validation/validation.service';
-import { CreateUserRequest, User, UserResponse } from 'src/model/user.model';
+import {
+  CreateUserRequest,
+  UpdateUserRequest,
+  User,
+  UserResponse,
+} from 'src/model/user.model';
 import { Logger } from 'winston';
 import { UserValidation } from './user.validation';
 import * as bcrypt from 'bcrypt';
@@ -30,16 +35,10 @@ export class UserService {
     return user;
   }
 
-  async findById(id: string): Promise<UserResponse> {
+  async findById(id: string): Promise<User> {
     const user = await this.prismaService.user.findFirst({
       where: {
         id: id,
-      },
-      select: {
-        id: true,
-        username: true,
-        email: true,
-        role: true,
       },
     });
 
@@ -102,21 +101,40 @@ export class UserService {
       request,
     );
 
-    const isUserExist = await this.findByEmail(userRequest.email);
+    // const isUserExist = await this.findByEmail(userRequest.email);
 
-    if (isUserExist) {
-      throw new HttpException(
-        {
-          message: 'Unique constraint violation',
-          errors: `Email ${userRequest.email} already exist`,
-        },
-        HttpStatus.CONFLICT,
-      );
-    }
+    // if (isUserExist) {
+    //   throw new HttpException(
+    //     {
+    //       message: 'Unique constraint violation',
+    //       errors: `Email ${userRequest.email} already exist`,
+    //     },
+    //     HttpStatus.CONFLICT,
+    //   );
+    // }
 
     userRequest.password = await bcrypt.hash(userRequest.password, 10);
 
     return this.prismaService.user.create({
+      data: userRequest,
+    });
+  }
+
+  async updateProfile(
+    id: string,
+    request: UpdateUserRequest,
+  ): Promise<UserResponse> {
+    this.logger.info(`Update user request: ${JSON.stringify(request)}`);
+
+    const userRequest = this.validationService.validate(
+      UserValidation.UPDATE,
+      request,
+    );
+
+    return this.prismaService.user.update({
+      where: {
+        id: id,
+      },
       data: userRequest,
     });
   }

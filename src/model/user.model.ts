@@ -4,6 +4,13 @@ export class CreateUserRequest {
   password: string;
 }
 
+export class UpdateUserRequest {
+  username?: string;
+  email?: string;
+  lastPasword?: string;
+  newPassword?: string;
+}
+
 export class UserResponse {
   id: string;
   username: string;

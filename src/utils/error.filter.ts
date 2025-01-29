@@ -14,7 +14,11 @@ export class ErrorFilter implements ExceptionFilter {
     let status =
       exception instanceof HttpException ? exception.getStatus() : 400; // Default to 400 for validation errors
     let message = 'An unknown error occurred';
-    let errors: string | { field: string; message: string }[] | undefined;
+    let errors:
+      | string
+      | { field: string; message: string }[]
+      | { field: string; message: string }
+      | undefined;
 
     // Handle Zod validation errors
     if (exception instanceof ZodError) {
@@ -32,8 +36,12 @@ export class ErrorFilter implements ExceptionFilter {
     ) {
       status = 409;
       message = 'Unique constraint violation';
-      const field = exception.meta?.target ? exception.meta.target : 'field';
-      errors = `The value for ${field} is already exist.`;
+      let field = exception.meta?.target ? exception.meta.target : 'field';
+      field = field.toString().split('_')[1];
+      errors = {
+        field: field.toString(),
+        message: `${field} already exist.`,
+      };
     }
 
     // Handle HttpException (other NestJS errors)
