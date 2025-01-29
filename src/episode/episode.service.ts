@@ -83,7 +83,7 @@ export class EpisodeService {
 
     const episode = await this.prismaService.episode.findUnique({
       where: {
-        episode_number: episodeNumber,
+        episodeNumber: episodeNumber,
       },
     });
 
@@ -99,7 +99,7 @@ export class EpisodeService {
 
     return this.prismaService.episode.update({
       where: {
-        episode_number: episodeNumber,
+        episodeNumber: episodeNumber,
       },
       data: updateRequest,
     });
@@ -127,7 +127,7 @@ export class EpisodeService {
 
     const episode = await this.prismaService.episode.findUnique({
       where: {
-        episode_number: episodeNumber,
+        episodeNumber: episodeNumber,
       },
     });
 
@@ -143,7 +143,7 @@ export class EpisodeService {
 
     return this.prismaService.episode.delete({
       where: {
-        episode_number: episodeNumber,
+        episodeNumber: episodeNumber,
       },
     });
   }

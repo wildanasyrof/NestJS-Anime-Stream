@@ -30,18 +30,21 @@ export class ErrorFilter implements ExceptionFilter {
     }
 
     // Handle Prisma unique constraint violation (P2002)
-    if (
-      exception instanceof Prisma.PrismaClientKnownRequestError &&
-      exception.code === 'P2002'
-    ) {
-      status = 409;
-      message = 'Unique constraint violation';
-      let field = exception.meta?.target ? exception.meta.target : 'field';
-      field = field.toString().split('_')[1];
-      errors = {
-        field: field.toString(),
-        message: `${field} already exist.`,
-      };
+    if (exception instanceof Prisma.PrismaClientKnownRequestError) {
+      if (exception.code === 'P2002') {
+        status = 409;
+        message = 'Unique constraint violation';
+        let field = exception.meta?.target ? exception.meta.target : 'field';
+        field = field.toString().split('_')[1];
+        errors = {
+          field: field.toString(),
+          message: `${field} already exist.`,
+        };
+      } else if (exception.code === 'P2025') {
+        status = 404;
+        message = 'Records not found';
+        errors = 'The record you are trying to access does not exist.';
+      }
     }
 
     // Handle HttpException (other NestJS errors)

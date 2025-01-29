@@ -20,40 +20,40 @@ enum Role {
 }
 
 model User {
-  id         String   @id @default(uuid())
-  username   String   @unique @db.VarChar(20)
-  email      String   @unique
-  password   String
-  role       Role     @default(USER)
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
+  id        String   @id @default(uuid())
+  username  String   @unique @db.VarChar(20)
+  email     String   @unique
+  password  String
+  role      Role     @default(USER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Anime {
-  id           Int       @id @default(autoincrement())
-  title        String
-  alt_titles   String?
-  chapters     String
-  source       String
-  year         String
-  rating       Float
-  synopsis     String
-  image_source String
-  episodes     Episode[]
-  genres       Genre[]   @relation("AnimeGenres")
-  created_at   DateTime  @default(now())
-  updated_at   DateTime  @updatedAt
+  id          Int       @id @default(autoincrement())
+  title       String
+  altTitles   String?
+  chapters    String
+  source      String
+  year        String
+  rating      Float
+  synopsis    String
+  imageSource String
+  episodes    Episode[]
+  genres      Genre[]   @relation("AnimeGenres")
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }
 
 model Episode {
-  id             Int      @id @default(autoincrement())
-  anime_id       Int
-  anime          Anime    @relation(fields: [anime_id], references: [id])
-  title          String
-  episode_number Int      @unique
-  video_url      String
-  created_at     DateTime @default(now())
-  updated_at     DateTime @updatedAt
+  id            Int      @id @default(autoincrement())
+  animeId       Int
+  anime         Anime    @relation(fields: [animeId], references: [id])
+  title         String
+  episodeNumber Int      @unique
+  videoUrl      String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }
 
 model Genre {
