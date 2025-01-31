@@ -57,7 +57,7 @@ export class UserService {
     return user;
   }
 
-  async login(request: LoginRequest): Promise<User> {
+  async login(request: LoginRequest): Promise<UserResponse> {
     const dataRequest = this.validationService.validate(
       UserValidation.LOGIN,
       request,
@@ -90,10 +90,14 @@ export class UserService {
       );
     }
 
-    return user;
+    return {
+      id: user.id,
+      username: user.username,
+      email: user.email,
+    };
   }
 
-  async create(request: CreateUserRequest): Promise<User> {
+  async create(request: CreateUserRequest): Promise<UserResponse> {
     this.logger.info(`Create user request: ${JSON.stringify(request)}`);
 
     const userRequest = this.validationService.validate(
@@ -117,6 +121,11 @@ export class UserService {
 
     return this.prismaService.user.create({
       data: userRequest,
+      select: {
+        id: true,
+        username: true,
+        email: true,
+      },
     });
   }
 

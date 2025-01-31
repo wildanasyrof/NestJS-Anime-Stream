@@ -15,7 +15,6 @@ export class UserResponse {
   id: string;
   username: string;
   email: string;
-  role: string;
 }
 
 export class User {
